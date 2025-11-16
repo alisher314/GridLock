@@ -3,28 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Генератор Паролей-Схем</title>
+    <title data-i18n="app_title">GridLock: Генератор Паролей-Схем</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>🔐 Генератор Паролей-Схем</h1>
         
+        <button id="lang-toggle-btn" style="float: right; padding: 5px 10px; margin-bottom: 10px; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--color-border); color: var(--color-text-primary); border-radius: 8px; cursor: pointer;">EN</button>
+        
+        <h1 data-i18n="app_title">🔐 GridLock: Генератор Паролей-Схем</h1>
+
         <div id="main-menu" class="screen active">
-            <h2>Главное меню</h2>
-            <button id="nav-create" class="menu-btn">➕ Создать новую сетку паролей</button>
-            <button id="nav-my-grids" class="menu-btn">📂 Мои сетки паролей</button>
+            <h2 data-i18n="menu_main">Главное меню</h2>
+            <button id="nav-create" class="menu-btn" data-i18n="btn_create_new">➕ Создать новую сетку паролей</button>
+            <button id="nav-my-grids" class="menu-btn" data-i18n="btn_my_grids">📂 Мои сетки паролей</button>
         </div>
 
         <div id="create-grid-screen" class="screen hidden">
-            <button id="back-from-create" class="back-btn">← Назад в меню</button>
-            <h2>Создание новой сетки</h2>
+            <button id="back-from-create" class="back-btn" data-i18n="btn_back_menu">← Назад в меню</button>
+            <h2 data-i18n="create_title">Создание новой сетки</h2>
             
-            <p class="instruction">**Шаг 1. Имя сайта (ключ):**</p>
-            <input type="text" id="new-site-name" placeholder="Имя сайта (напр., Instagram)" required>
+            <p class="instruction" data-i18n="step1_name">1. Имя сайта (ключ):</p>
+            <input type="text" id="new-site-name" data-i18n-placeholder="placeholder_site" placeholder="Имя сайта (напр., Instagram)" required>
 
-            <p class="instruction">**Шаг 2. Опции и символы:**</p>
-            <label for="grid-size-select">Размер сетки (NxN):</label>
+            <p class="instruction" data-i18n="step2_options">2. Опции и символы:</p>
+            <label for="grid-size-select" data-i18n="label_size">Размер сетки (NxN):</label>
             <select id="grid-size-select">
                 <option value="10">10x10 (стандарт)</option>
                 <option value="8">8x8</option>
@@ -35,15 +38,15 @@
             <p>Источник символов:</p>
             <div id="symbol-source-options">
                 <input type="radio" name="source" id="source-random" value="random" checked>
-                <label for="source-random">Случайная генерация</label>
+                <label for="source-random" data-i18n="source_random">Случайная генерация</label>
 
                 <input type="radio" name="source" id="source-manual" value="manual">
-                <label for="source-manual">Ввести свои символы</label>
+                <label for="source-manual" data-i18n="source_manual">Ввести свои символы</label>
             </div>
             
-            <textarea id="manual-chars-input" placeholder="Введите символы для сетки (минимум N*N символов)" rows="3" class="hidden"></textarea>
+            <textarea id="manual-chars-input" data-i18n-placeholder="placeholder_manual" placeholder="Введите символы для сетки (минимум N*N символов)" rows="3" class="hidden"></textarea>
 
-            <p>Набор символов (для случайной генерации):</p>
+            <p data-i18n="step4_set">4. Набор символов (для случайной генерации):</p>
             <div id="char-options">
                 <input type="checkbox" id="char-lower" checked><label for="char-lower"> a-z</label>
                 <input type="checkbox" id="char-upper" checked><label for="char-upper"> A-Z</label>
@@ -51,21 +54,21 @@
                 <input type="checkbox" id="char-symbols" checked><label for="char-symbols"> !@#...</label>
             </div>
             
-            <button id="generate-and-save-button" class="action-btn">Создать сетку и сохранить</button>
+            <button id="generate-and-save-button" class="action-btn" data-i18n="btn_generate_save">Создать сетку и сохранить</button>
             <p id="create-message" class="message-area"></p>
         </div>
 
         <div id="my-grids-screen" class="screen hidden">
-            <button id="back-from-my-grids" class="back-btn">← Назад в меню</button>
-            <h2>Мои сохраненные сетки</h2>
+            <button id="back-from-my-grids" class="back-btn" data-i18n="btn_back_menu">← Назад в меню</button>
+            <h2 data-i18n="mygrids_title">Мои сохраненные сетки</h2>
             <div id="grids-list">
-                <p>Здесь будут отображаться ваши сохраненные сетки.</p>
+                <p data-i18n="msg_no_grids">Здесь будут отображаться ваши сохраненные сетки.</p>
             </div>
         </div>
         
         <div id="grid-viewer-screen" class="screen hidden">
-            <button id="back-from-viewer" class="back-btn">← Назад к списку</button>
-            <h2 id="current-site-title">Сетка для: [Имя сайта]</h2>
+            <button id="back-from-viewer" class="back-btn" data-i18n="btn_back_list">← Назад к списку</button>
+            <h2 id="current-site-title" data-i18n-prefix="viewer_title_prefix">Сетка для: [Имя сайта]</h2>
             
             <div class="grid-wrapper">
                 <div id="grid-container" class="grid">
@@ -73,25 +76,26 @@
             </div>
             
             <div id="selection-display">
-                <h3>Выбранные символы:</h3>
+                <h3 data-i18n="selected_chars">Выбранные символы:</h3>
                 <p id="selected-password"></p>
             </div>
             
-            <button id="copy-button">Копировать выбранный пароль</button>
-            <button id="copy-all-button" class="action-btn">Копировать всю сетку</button>
+            <button id="copy-button" data-i18n="btn_copy_selected">Копировать выбранный пароль</button>
+            <button id="copy-all-button" class="action-btn" data-i18n="btn_copy_all">Копировать всю сетку</button>
             
             <div class="instruction-box">
-                <h4>Инструкция по использованию:</h4>
-                <p>1. **Проведение:** Для генерации пароля **проведите мышью** (или пальцем) по ячейкам в определенном вами порядке (схеме).</p>
-                <p>2. **Секрет:** Пароль определяется **сеткой** (которая хранится здесь) и вашей **схемой движения** (которая хранится только в вашей памяти).</p>
-                <p>3. **Безопасность:** Чтобы восстановить пароль, вам достаточно помнить имя сайта и схему. Не записывайте схему рядом с сеткой!</p>
+                <h4 data-i18n="inst_title">Инструкция по использованию:</h4>
+                <p data-i18n="inst_1">1. Проведение: Для генерации пароля **проведите мышью** (или пальцем) по ячейкам в определенном вами порядке (схеме).</p>
+                <p data-i18n="inst_2">2. Секрет: Пароль определяется **сеткой** (которая хранится здесь) и вашей **схемой движения** (которая хранится только в вашей памяти).</p>
+                <p data-i18n="inst_3">3. Безопасность: Чтобы восстановить пароль, вам достаточно помнить имя сайта и схему. Не записывайте схему рядом с сеткой!</p>
             </div>
         </div>
 
     </div> <footer class="app-footer">
-        <p>Генератор Паролей-Схем | **Glassmorphism Dark v1.0**</p>
+        <p data-i18n="footer">GridLock | Glassmorphism Dark v1.0</p>
     </footer>
 
+    <script src="i18n.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
