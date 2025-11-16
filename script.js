@@ -7,6 +7,45 @@ const CHAR_SETS = {
 };
 const STORAGE_PREFIX = 'password_grid_';
 
+// --- Функции Интернационализации (i18n) ---
+
+/**
+ * Обновляет текст всех элементов, имеющих атрибут data-i18n.
+ */
+function updateInterfaceText() {
+    // Обновление обычного текста
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = t(key);
+    });
+
+    // Обновление плейсхолдеров
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        el.placeholder = t(key);
+    });
+
+    // Обновление префиксов (для H2 с именем сайта)
+    document.querySelectorAll('[data-i18n-prefix]').forEach(el => {
+        const key = el.getAttribute('data-i18n-prefix');
+        const siteName = el.textContent.split(':').pop().trim(); 
+        el.textContent = t(key) + ': ' + siteName;
+    });
+
+    // Обновление кнопки языка
+    const langBtn = document.getElementById('lang-toggle-btn');
+    langBtn.textContent = (currentLanguage === 'ru' ? 'EN' : 'RU');
+
+    // Обновление title страницы
+    document.title = t('app_title');
+    
+    // Перезагрузка списка сеток для перевода кнопок
+    if (!screens.myGrids.classList.contains('hidden')) {
+         displayMyGrids();
+    }
+}
+
+
 // --- Элементы DOM (Экраны) ---
 const screens = {
     menu: document.getElementById('main-menu'),
@@ -43,10 +82,8 @@ const drawingCanvas = document.getElementById('drawing-canvas');
 let isDrawing = false;
 let selectedCells = new Set(); 
 let currentViewSiteName = null; 
-// Массив cellPositions больше не нужен для рисования, но оставим его, 
-// так как он может быть полезен для других целей, но очистим логику его заполнения.
 let cellPositions = []; 
-let selectedPoints = []; // Хранит {id, x, y, element} точек выбранных ячеек в порядке выбора
+let selectedPoints = []; 
 
 // --- Управление экранами ---
 
@@ -94,7 +131,7 @@ function loadGrid(siteName) {
 }
 
 function deleteGrid(siteName) {
-    if (confirm(`Вы уверены, что хотите удалить сетку для "${siteName}"?`)) {
+    if (confirm(t('alert_delete_confirm', siteName))) {
         const key = STORAGE_PREFIX + siteName.toLowerCase();
         localStorage.removeItem(key);
         displayMyGrids(); 
@@ -144,7 +181,7 @@ function toggleManualInput() {
 function handleGenerateAndSave() {
     const siteName = newSiteNameInput.value.trim();
     if (!siteName) {
-        createMessage.textContent = '⛔ Пожалуйста, введите имя сайта.';
+        createMessage.textContent = t('alert_enter_site_name');
         createMessage.style.color = 'red';
         return;
     }
@@ -157,7 +194,7 @@ function handleGenerateAndSave() {
         // --- РУЧНОЙ ВВОД ---
         let manualInput = manualCharsInput.value.trim().replace(/\s/g, ''); 
         if (manualInput.length < totalRequired) {
-            createMessage.textContent = `⛔ Для сетки ${selectedSize}x${selectedSize} требуется ${totalRequired} символов. Введено: ${manualInput.length}.`;
+            createMessage.textContent = t('alert_chars_required', manualInput.length, totalRequired);
             createMessage.style.color = 'red';
             return;
         }
@@ -167,7 +204,7 @@ function handleGenerateAndSave() {
         // --- СЛУЧАЙНАЯ ГЕНЕРАЦИЯ ---
         const charSet = getCharacterSet();
         if (charSet.length === 0) {
-            createMessage.textContent = '⛔ Пожалуйста, выберите хотя бы один тип символов.';
+            createMessage.textContent = t('alert_select_char_type');
             createMessage.style.color = 'red';
             return;
         }
@@ -175,7 +212,7 @@ function handleGenerateAndSave() {
     }
 
 
-    if (loadGrid(siteName) && !confirm(`Сетка для "${siteName}" уже существует. Перезаписать?`)) {
+    if (loadGrid(siteName) && !confirm(t('alert_overwrite_confirm', siteName))) {
         return;
     }
 
@@ -187,7 +224,7 @@ function handleGenerateAndSave() {
     
     newSiteNameInput.value = '';
     manualCharsInput.value = ''; 
-    createMessage.textContent = `✅ Сетка для "${siteName}" успешно создана и сохранена!`;
+    createMessage.textContent = t('alert_success_saved', siteName);
     createMessage.style.color = 'green';
     
     renderGrid(siteName, gridData);
@@ -200,7 +237,7 @@ function displayMyGrids() {
     gridsListContainer.innerHTML = '';
 
     if (siteNames.length === 0) {
-        gridsListContainer.innerHTML = '<p>У вас пока нет сохраненных сеток.</p>';
+        gridsListContainer.innerHTML = `<p>${t('msg_no_grids')}</p>`;
         return;
     }
 
@@ -210,7 +247,7 @@ function displayMyGrids() {
         item.innerHTML = `<span>${name}</span>`;
         
         const viewButton = document.createElement('button');
-        viewButton.textContent = 'Открыть сетку';
+        viewButton.textContent = t('btn_view_grid'); // <-- ИСПРАВЛЕНО
         viewButton.classList.add('view-btn');
         
         viewButton.addEventListener('click', () => {
@@ -218,12 +255,12 @@ function displayMyGrids() {
             if (gridData) {
                 renderGrid(name, gridData);
             } else {
-                alert('Ошибка: Не удалось загрузить сетку.');
+                alert(t('alert_load_error'));
             }
         });
 
         const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Удалить';
+        deleteButton.textContent = t('btn_delete'); // <-- ИСПРАВЛЕНО
         deleteButton.classList.add('delete-btn');
         
         deleteButton.addEventListener('click', (e) => {
@@ -240,17 +277,12 @@ function displayMyGrids() {
     });
 }
 
-// --- Настройка сетки и Canvas ---
+// --- Настройка сетки ---
 
 function setupCanvas(size) {
     const wrapper = document.querySelector('.grid-wrapper');
     const rect = wrapper.getBoundingClientRect();
     
-    // Внимание: Логика Canvas удалена, но оставим установку размеров
-    // на случай, если вы решите добавить другой визуальный элемент позже.
-    drawingCanvas.width = rect.width;
-    drawingCanvas.height = rect.height;
-
     cellPositions = [];
     const cellElements = gridContainer.querySelectorAll('.cell');
     
@@ -258,7 +290,6 @@ function setupCanvas(size) {
         const cellRect = cell.getBoundingClientRect();
         const wrapperRect = wrapper.getBoundingClientRect(); 
         
-        // Эти координаты больше не используются для рисования, но сохраняют элемент
         const x = cellRect.left + cellRect.width / 2 - wrapperRect.left;
         const y = cellRect.top + cellRect.height / 2 - wrapperRect.top;
         
@@ -277,7 +308,9 @@ function renderGrid(siteName, gridData) {
     const characters = gridData.characters;
 
     currentViewSiteName = siteName;
-    currentSiteTitle.textContent = `Сетка для: ${siteName} (${size}x${size})`;
+    
+    // Обновление заголовка с учетом текущего языка
+    currentSiteTitle.textContent = t('viewer_title_prefix') + `: ${siteName} (${size}x${size})`;
 
     gridContainer.innerHTML = '';
     gridContainer.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
@@ -318,7 +351,6 @@ function clearSelectionAndCanvas() {
     selectedCells.clear();
     selectedPasswordDisplay.textContent = '';
     selectedPoints = [];
-    // ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height); // Удалена очистка канваса
 }
 
 function startDraw(e) {
@@ -341,19 +373,12 @@ function selectCell(cell) {
         const newCellPosition = cellPositions.find(p => p.id === cellId);
         
         if (newCellPosition) {
-            // lastPoint больше не нужен для drawTrace
-            // const lastPoint = selectedPoints.length > 0 ? selectedPoints[selectedPoints.length - 1] : null; 
-            
             selectedPoints.push(newCellPosition);
-            
-            // drawTrace(lastPoint, newCellPosition); // Вызов drawTrace удален
         }
         
         updatePasswordDisplay(); 
     }
 }
-
-// *** Функция drawTrace удалена ***
 
 function draw(e) {
     if (!isDrawing) return;
@@ -389,13 +414,13 @@ function copyPassword() {
     const password = selectedPasswordDisplay.textContent;
     if (password) {
         navigator.clipboard.writeText(password).then(() => {
-            alert('Пароль скопирован в буфер обмена!');
+            alert(t('alert_copied'));
         }).catch(err => {
             console.error('Ошибка копирования: ', err);
-            alert('Не удалось скопировать пароль. Попробуйте вручную.');
+            alert(t('alert_copy_error'));
         });
     } else {
-        alert('Сначала выберите символы!');
+        alert(t('alert_select_first'));
     }
 }
 
@@ -406,17 +431,17 @@ function copyAllSymbols() {
     const gridData = loadGrid(currentViewSiteName); 
     
     if (!gridData || !gridData.characters) {
-        alert('Ошибка: Нет активной или сохраненной сетки для копирования.');
+        alert(t('alert_no_active_grid'));
         return;
     }
     
     const allSymbols = gridData.characters.join('');
 
     navigator.clipboard.writeText(allSymbols).then(() => {
-        alert(`Все ${allSymbols.length} символов сетки скопированы в буфер обмена!`);
+        alert(t('alert_all_copied', allSymbols.length));
     }).catch(err => {
         console.error('Ошибка копирования всей сетки: ', err);
-        alert('Не удалось скопировать все символы. Попробуйте вручную.');
+        alert(t('alert_copy_all_error'));
     });
 }
 
@@ -461,6 +486,16 @@ document.getElementById('back-from-viewer').addEventListener('click', displayMyG
 // Кнопка сохранения новой сетки
 document.getElementById('generate-and-save-button').addEventListener('click', handleGenerateAndSave);
 
+// Кнопка переключения языка
+document.getElementById('lang-toggle-btn').addEventListener('click', () => {
+    currentLanguage = (currentLanguage === 'ru' ? 'en' : 'ru');
+    updateInterfaceText();
+});
+
+
 // Начальная загрузка: показываем главное меню и устанавливаем начальное состояние ввода
 showScreen('menu');
-document.addEventListener('DOMContentLoaded', toggleManualInput);
+document.addEventListener('DOMContentLoaded', () => {
+    updateInterfaceText(); // Вызываем перевод при загрузке
+    toggleManualInput();
+});
