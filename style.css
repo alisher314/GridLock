@@ -19,10 +19,10 @@ body {
     background-color: var(--color-background); 
     color: var(--color-text-primary);
     
-    /* ИСПРАВЛЕНИЕ: Используем block или flex-column для правильного размещения футера */
+    /* ИСПРАВЛЕНИЕ ДЛЯ ФУТЕРА: Используем display: block для корректного размещения */
     display: block; 
     
-    padding: 0; /* Убираем padding с body, добавляем его к контейнеру */
+    padding: 0; 
     margin: 0;
     min-height: 100vh;
     box-sizing: border-box;
@@ -31,14 +31,13 @@ body {
 }
 
 .container {
-    /* Добавляем центрирование через margin: auto */
-    margin: 20px auto; 
-    padding: 30px; 
-    
-    /* ... (остальные стили .container остаются без изменений) ... */
     width: 100%;
     max-width: 650px; 
+    /* ЦЕНТРИРОВАНИЕ: margin: auto */
+    margin: 20px auto; 
+    
     background: rgba(20, 20, 35, 0.4); 
+    padding: 30px;
     border-radius: var(--radius);
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); 
     border: 1px solid var(--color-border);
@@ -86,7 +85,7 @@ h2 {
     border-radius: var(--radius);
     margin-top: 20px;
     background-color: var(--color-surface-bg);
-    backdrop-filter: blur(var(--blur-strength)); /* Ключевой эффект Glassmorphism */
+    backdrop-filter: blur(var(--blur-strength)); 
     -webkit-backdrop-filter: blur(var(--blur-strength));
     animation: fadeIn 0.4s ease-out;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
@@ -96,7 +95,6 @@ h2 {
     display: none !important;
 }
 
-/* Главные кнопки меню */
 .menu-btn {
     display: block;
     width: 90%;
@@ -171,7 +169,6 @@ h2 {
     gap: 10px;
 }
 
-/* Стили для выбора символов (чекбоксы/радио) */
 #char-options label, #symbol-source-options label {
     color: var(--color-text-secondary);
     transition: color 0.2s;
@@ -189,7 +186,7 @@ h2 {
     position: relative; 
     margin: 20px auto;
     max-width: 500px; 
-    border: 1px solid var(--color-border); /* Тонкая рамка */
+    border: 1px solid var(--color-border); 
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s ease;
@@ -199,15 +196,6 @@ h2 {
 .grid-wrapper:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
-}
-
-/* Элемент #drawing-canvas удален из HTML, но оставляем placeholder-стили, если он вернется */
-#drawing-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 10;
-    pointer-events: none; 
 }
 
 .grid {
@@ -221,7 +209,7 @@ h2 {
 
 .cell {
     padding: 8px 5px; 
-    border: 1px solid rgba(255, 255, 255, 0.05); /* Очень тонкие линии сетки */
+    border: 1px solid rgba(255, 255, 255, 0.05); 
     font-size: 0.8em; 
     font-weight: 600;
     cursor: pointer;
@@ -242,7 +230,7 @@ h2 {
 
 .cell.selected {
     background-color: var(--color-accent-blue); 
-    color: var(--color-background); /* Темный текст на синем фоне */
+    color: var(--color-background); 
     font-weight: 900;
     animation: pulse 0.3s ease; 
 }
@@ -267,7 +255,6 @@ h2 {
 /* 6. КНОПКИ ДЕЙСТВИЙ И СПИСОК СЕТОК */
 /* ==================================== */
 
-/* Общий стиль для кнопок действий */
 .action-btn, #copy-button, #copy-all-button, .grid-item button {
     padding: 12px 25px;
     margin: 5px;
@@ -285,7 +272,6 @@ h2 {
     box-shadow: 0 5px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* Цвета кнопок */
 .action-btn { background-color: var(--color-accent-blue); color: var(--color-background); }
 .action-btn:hover { background-color: #5d98f7; }
 
@@ -326,21 +312,60 @@ h2 {
     margin-right: 15px;
 }
 
-.instruction {
-    font-size: 0.9em;
-    color: var(--color-text-secondary);
-    margin-top: 20px;
+/* ==================================== */
+/* 8. ИНСТРУКЦИИ И ФУТЕР */
+/* ==================================== */
+
+.instruction-box {
+    margin-top: 25px;
+    padding: 15px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background-color: rgba(20, 20, 35, 0.4); 
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    text-align: left;
 }
 
+.instruction-box h4 {
+    color: var(--color-accent-blue);
+    margin-top: 0;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed var(--color-border);
+    padding-bottom: 5px;
+    font-size: 1.1em;
+}
+
+.instruction-box p {
+    font-size: 0.9em;
+    line-height: 1.4;
+    color: var(--color-text-secondary);
+    margin-bottom: 5px;
+}
+
+.app-footer {
+    margin-top: 30px; 
+    padding: 15px 20px; 
+    width: 100%; 
+    box-sizing: border-box; /* Важно для корректной ширины */
+    
+    background-color: #0d0d1a; 
+    color: var(--color-text-secondary);
+    font-size: 0.8em;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    opacity: 0.8;
+}
 
 /* ==================================== */
-/* 7. АДАПТИВНОСТЬ */
+/* 9. АДАПТИВНОСТЬ */
 /* ==================================== */
 @media (max-width: 600px) {
     .container {
         padding: 20px 15px;
         border-radius: 0; 
         box-shadow: none; 
+        margin-top: 0;
     }
     
     .menu-btn, .action-btn, #copy-button, #copy-all-button {
@@ -367,26 +392,4 @@ h2 {
         width: 48%;
         padding: 10px;
     }
-}
-
-/* ==================================== */
-/* 8. ИНСТРУКЦИИ И ФУТЕР */
-/* ==================================== */
-
-/* ... (Инструкции остаются без изменений) ... */
-
-/* Стиль для футера */
-.app-footer {
-    margin-top: 30px; /* Отступ сверху, чтобы отделить от контейнера */
-    padding: 15px 20px; 
-    width: 100%; 
-    
-    /* Стили Glassmorphism Dark */
-    background-color: #0d0d1a; 
-    color: var(--color-text-secondary);
-    font-size: 0.8em;
-    text-align: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    opacity: 0.8;
-    box-sizing: border-box; /* Важно для padding и width: 100% */
 }
